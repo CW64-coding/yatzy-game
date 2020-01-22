@@ -5,7 +5,8 @@
 #   * 6 dice, 3 rolls per round (unused rolls are saved and accumulate)
 #   * player can choose order to assign scores (within current section)
 #   * Bonus is achieved with score of >=75 in 'Upper' section
-
+#   * The same number can be used in hands
+#       e.g. three 6's and 2 6's is also a full house
 
 
 from random import randint           # needed for dice rolls
@@ -14,7 +15,7 @@ import re                   # regular expressions used to check some inputs
 import time                 # for pausing and better user readability
 from itertools import combinations as combo     # for finding sets
 
-t = 0               # variable for pauses, set to 0 while I'm testing
+t = 2               # variable for pauses, set to 0 while I'm testing
 
 class Player():
     def __init__(self, name, extra_rolls=0):
@@ -115,7 +116,9 @@ def score(dice, section, player):
                 else [2*(x[0]+x[1]) for x in two_pairs])}
         
 
-        three_pairs = [x for x in combo(all_pairs, 3)]
+        three_pairs = ([x for x in combo(all_pairs, 3)]
+                        if len(set(dice)) > 1
+                        else [(x, x, x) for x in set(dice)])
         
         score_choice["3 pairs"] = {
             "Dice": three_pairs,
@@ -223,7 +226,6 @@ def score(dice, section, player):
             "Dice": yatzy,
             "Score": ([0] if yatzy == [] else [100])}
 
-
         print()
         print()
         print("Possible scores   = [Dice used]                    [Score]:-","\n")
@@ -260,11 +262,6 @@ def score(dice, section, player):
             except (ValueError, KeyError): 
                 print("Try again, type a code from the list above.")
                 print()
-
-
-
-
-
     else:
         print("Unexpected 'section' error...")
 
@@ -367,13 +364,14 @@ def play_Yatzy():
             roll(players[j])
             print("="*72)
     global scoresheet           # otherwise scoresheet is a new local variable
-    scoresheet.loc["Subtotal"] = 0
+    scoresheet.loc["Subtotal - Upper"] = 0
     scoresheet.loc["Bonus"] = 0
     for P in players:
-        scoresheet.loc["Subtotal", P.n] = scoresheet[P.n].sum()
-        if scoresheet.loc["Subtotal", P.n] >= 75:
+        scoresheet.loc["Subtotal - Upper", P.n] = scoresheet[P.n].sum()
+        if scoresheet.loc["Subtotal - Upper", P.n] >= 75:
             scoresheet.loc["Bonus", P.n] = 50
-    
+    scoresheet.loc["------"] = "---"
+
     print()
     print("="*72)
     print("*"*72)
@@ -389,8 +387,7 @@ def play_Yatzy():
     print()
     time.sleep(t)
     print("Final section...")
-    print()
-    
+    print() 
     ss_lower = pd.DataFrame(index = lower_rows, columns = [p.n for p in players])
     scoresheet = pd.concat([scoresheet, ss_lower])
     print(scoresheet)
@@ -408,14 +405,14 @@ def play_Yatzy():
             roll(players[j])
             print("="*72)
 
-
-    scoresheet.loc["Subtotal 2"] = 0
+    scoresheet.loc["------"] = "---"
+    scoresheet.loc["Subtotal - Lower"] = 0
+    scoresheet.loc["======"] = "==="
     scoresheet.loc["Grand total"] = 0
-    scoresheet.loc["Subtotal 2"] = scoresheet.loc[lower_rows].sum()
+    scoresheet.loc["Subtotal - Lower"] = scoresheet.loc[lower_rows].sum()
     scoresheet.loc["Grand total"] = scoresheet.loc[
-                            ["Subtotal", "Bonus", "Subtotal 2"]].sum()
+        ["Subtotal - Upper", "Bonus", "Subtotal - Lower"]].sum()
 
-# TODO fix final print - dataframe fix
 
     print()
     print("="*72)
@@ -424,11 +421,10 @@ def play_Yatzy():
     print()
     time.sleep(t)
     print(scoresheet)
+    print()
     print("*"*72)
     print("="*72)
- 
-    for P in players:
-        print(P.n, "final score =", (scoresheet.loc["Subtotal", P.n] + scoresheet.loc["Bonus", P.n]))
+    print()
 
 play_Yatzy()
 
