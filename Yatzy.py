@@ -309,7 +309,11 @@ def roll(player):
             break
         print(f"""Options:
             1) lock in current roll, save {(2-i)} extra rolls
+<<<<<<< HEAD
             2) re-roll (from A-F state which dice to re-roll)""")
+=======
+            2) re-roll (from A-F state which dice to KEEP, if any)""")
+>>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
         print("-"*72)
         
         choice = input("Type '1' to lock in or '2' to re-roll: ")
@@ -371,12 +375,17 @@ def play_Yatzy():
         if scoresheet.loc["Subtotal - Upper", P.n] >= 75:
             scoresheet.loc["Bonus", P.n] = 50
     scoresheet.loc["------"] = "---"
+<<<<<<< HEAD
     time.sleep(t)
+=======
+
+>>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
     print()
     print("="*72)
     print("*"*72)
     print("Scores so far...")
     print()
+<<<<<<< HEAD
     time.sleep(t*2)
     print(scoresheet)
     print("*"*72)
@@ -386,6 +395,17 @@ def play_Yatzy():
     section = lower_rows
     print()
     print()
+=======
+    time.sleep(t)
+    print(scoresheet)
+    print("*"*72)
+    print("="*72)
+   
+    section = lower_rows
+    print()
+    print()
+    time.sleep(t)
+>>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
     print("Final section...")
     print() 
     ss_lower = pd.DataFrame(index = lower_rows, columns = [p.n for p in players])
@@ -404,8 +424,11 @@ def play_Yatzy():
             print("="*72)
             roll(players[j])
             print("="*72)
+<<<<<<< HEAD
     
     time.sleep(t)
+=======
+>>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
 
     scoresheet.loc["------"] = "---"
     scoresheet.loc["Subtotal - Lower"] = 0
