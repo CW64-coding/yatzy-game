@@ -309,7 +309,7 @@ def roll(player):
             break
         print(f"""Options:
             1) lock in current roll, save {(2-i)} extra rolls
-            2) re-roll (from A-F state which dice to KEEP, if any)""")
+            2) re-roll (from A-F state which dice to re-roll)""")
         print("-"*72)
         
         choice = input("Type '1' to lock in or '2' to re-roll: ")
