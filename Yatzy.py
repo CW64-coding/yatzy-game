@@ -25,16 +25,16 @@ class Player():
 def game_setup():       # function to set number of players & get names
     while True:
         global n        # ensures 'n' is accessible outside function
-        n = input("Number of players (2-6):")
+        n = input("Number of players (2-6): ")
         try:
             n = int(n)
         except ValueError:
-            print("Valid integer please. Try again.")
+            print("Valid integer please. Try again: ")
             continue
         if (2 <= n <= 6):
             break
         else:
-            print("Invalid range. Try again (2-6).")
+            print("Invalid range. Try again (2-6): ")
 
     global players
     players = []
@@ -45,7 +45,7 @@ def game_setup():       # function to set number of players & get names
             if name_input != "" and name_input not in players:
                 break
             else:
-                print("Invalid or name already taken. Please try again.")
+                print("Invalid or name already taken. Please try again: ")
         players.append(Player(name = name_input))
 
 game_setup()
@@ -87,13 +87,13 @@ def score(dice, section, player):
             try:
                 choice = int(input("Choose: ")) - 1     # -1 to match PC counting
                 if choice not in range(6):
-                    print("Try again, type between 1-6.")
+                    print("Try again, type between 1-6: ")
                 elif pd.notna(scoresheet.loc[section[choice], player.n]):
                     print("Score already fixed, please choose again.\n")
                 else:
                     return section[choice], score_choice[section[choice]]
             except (ValueError, IndexError):
-                print("Try again, type between 1-6.")
+                print("Try again, type between 1-6: ")
                 continue
     elif section == lower_rows:
         score_choice = {}
@@ -381,7 +381,7 @@ def play_Yatzy():
     print(scoresheet)
     print("*"*72)
     print("="*72)
-    time.sleep(t*2)
+    time.sleep(t*4)
   
     section = lower_rows
     print()
@@ -429,7 +429,7 @@ def play_Yatzy():
     print("*"*72)
     print("FINAL SCORES...")
     print()
-    time.sleep(t)
+    time.sleep(t*4)
     print(scoresheet)
     print()
     print("*"*72)
