@@ -174,7 +174,7 @@ def score(dice, section, player):
             "Dice": ([1,2,3,4,5,6]
                 if len(set(dice)) == 6
                 else []),
-            "Score": ([21]
+            "Score": ([25]
                 if len(set(dice)) == 6
                 else [0])}
 
