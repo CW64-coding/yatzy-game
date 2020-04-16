@@ -1,5 +1,5 @@
 # This file will run a Maxi Yatzy game.
-# Developed just for fun and Python/vim coding practice.
+# Developed just for fun and Python/Vim coding practice.
 
 # Rules of Yatzy used for this game:-
 #   * 6 dice, 3 rolls per round (unused rolls are saved and accumulate)
@@ -9,13 +9,13 @@
 #       e.g. three 6's and 2 6's is also a full house
 
 
-from random import randint           # needed for dice rolls
+from random import randint  # needed for dice rolls
 import pandas as pd         # the scoresheet will be displayed as DataFrame
 import re                   # regular expressions used to check some inputs
 import time                 # for pausing and better user readability
 from itertools import combinations as combo     # for finding sets
 
-t = 2               # variable for pauses, set to 0 while I'm testing
+t = 0           # variable for pauses, set to 0 while testing
 
 class Player():
     def __init__(self, name, extra_rolls=0):
@@ -309,11 +309,7 @@ def roll(player):
             break
         print(f"""Options:
             1) lock in current roll, save {(2-i)} extra rolls
-<<<<<<< HEAD
             2) re-roll (from A-F state which dice to re-roll)""")
-=======
-            2) re-roll (from A-F state which dice to KEEP, if any)""")
->>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
         print("-"*72)
         
         choice = input("Type '1' to lock in or '2' to re-roll: ")
@@ -327,7 +323,6 @@ def roll(player):
         else:
             player.e += (2-i)
             break
-
 
 
     print("-"*72)
@@ -375,17 +370,13 @@ def play_Yatzy():
         if scoresheet.loc["Subtotal - Upper", P.n] >= 75:
             scoresheet.loc["Bonus", P.n] = 50
     scoresheet.loc["------"] = "---"
-<<<<<<< HEAD
     time.sleep(t)
-=======
 
->>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
     print()
     print("="*72)
     print("*"*72)
     print("Scores so far...")
     print()
-<<<<<<< HEAD
     time.sleep(t*2)
     print(scoresheet)
     print("*"*72)
@@ -395,7 +386,6 @@ def play_Yatzy():
     section = lower_rows
     print()
     print()
-=======
     time.sleep(t)
     print(scoresheet)
     print("*"*72)
@@ -405,7 +395,6 @@ def play_Yatzy():
     print()
     print()
     time.sleep(t)
->>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
     print("Final section...")
     print() 
     ss_lower = pd.DataFrame(index = lower_rows, columns = [p.n for p in players])
@@ -424,11 +413,8 @@ def play_Yatzy():
             print("="*72)
             roll(players[j])
             print("="*72)
-<<<<<<< HEAD
     
     time.sleep(t)
-=======
->>>>>>> d9f6ac9e4835f706ed43a355eab9af6394827217
 
     scoresheet.loc["------"] = "---"
     scoresheet.loc["Subtotal - Lower"] = 0
@@ -437,7 +423,6 @@ def play_Yatzy():
     scoresheet.loc["Subtotal - Lower"] = scoresheet.loc[lower_rows].sum()
     scoresheet.loc["Grand total"] = scoresheet.loc[
         ["Subtotal - Upper", "Bonus", "Subtotal - Lower"]].sum()
-
 
     print()
     print("="*72)
@@ -452,5 +437,3 @@ def play_Yatzy():
     print()
 
 play_Yatzy()
-
-
