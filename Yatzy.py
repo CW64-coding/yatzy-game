@@ -70,6 +70,8 @@ print()
 print("LET YATZY BEGIN!!!")
 print()
 print(scoresheet)
+print()
+print("(Note - 'NaN' is a blank placeholder)")
 
 def score(dice, section, player):
     if section == upper_rows:
@@ -82,6 +84,7 @@ def score(dice, section, player):
         time.sleep(t)
         print("Make a selection, type 1-6. E.g. for 'Four's', enter: 4")
         print("(Note you can only choose a free option)")
+        print("(...and only the maximum score will be taken, of course!)")
         print()
         while True:
             try:
@@ -89,7 +92,7 @@ def score(dice, section, player):
                 if choice not in range(6):
                     print("Try again, type between 1-6: ")
                 elif pd.notna(scoresheet.loc[section[choice], player.n]):
-                    print("Score already fixed, please choose again.\n")
+                    print("Score already filled-in, please choose again.\n")
                 else:
                     return section[choice], score_choice[section[choice]]
             except (ValueError, IndexError):
