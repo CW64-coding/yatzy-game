@@ -118,11 +118,12 @@ def score(dice, section, player):
             "Score": ([0] if len(two_pairs) == 0
                 else [2*(x[0]+x[1]) for x in two_pairs])}
         
+        # TODO: I think case of [1,1,1,1,4,4] wouldn't offer [(1,1,4)]... FIX BELOW
 
         three_pairs = ([x for x in combo(all_pairs, 3)]
                         if len(set(dice)) > 1
                         else [(x, x, x) for x in set(dice)])
-        
+              
         score_choice["3 pairs"] = {
             "Dice": three_pairs,
             "Score": ([0] if three_pairs == []
