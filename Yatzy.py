@@ -106,6 +106,7 @@ def score(dice, section, player):
         # first we turn the dice into a string for the regex checks that follow
         dice_str = "".join(str(x) for x in dice)
 
+        # regex pattern for '1 pair'
         rx_1p = re.compile(r"""
             ([1-6])         # a valid die roll
             .*?             # any other value (non-greed)
@@ -120,12 +121,15 @@ def score(dice, section, player):
             "Score": ([0] if all_pairs == []
                         else [2*x for x in unique_pairs]}
 
-# TODO: from combo remove duplicate pairs e.g. (1, 2) & (2, 1)
+        # combo provides all iterations (of length 2 in this case)
+        # we sort and set as a hashable tuple so we avoid repeats
+        two_pairs = [tuple(sorted(x)) for x in combo(all_pairs, 2)]
+        two_pairs = list(set(two_pairs))
 
         score_choice["2 pairs"] = {
-            "Dice": list(combo(all_pairs, 2)),
-            "Score": ([0] if len(all_pairs) < 2
-                else [2*(x[0]+x[1]) for x in combo(all_pairs, 2)])}
+            "Dice": two_pairs,
+            "Score": ([0] if two_pairs == []
+                        else [2*(x[0]+x[1]) for x in two_pairs])}
            
             
             
