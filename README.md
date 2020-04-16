@@ -22,3 +22,4 @@ Assuming the reader is familiar with Yatzhee/Yatzy, below are the variations of 
   1. 2 pair (2 x '3' + 2 x '3') = 12 pts
   1. 3 of a kind (3 x '3') = 9 pts
   1. 1 pair (2 x '3') = 6 pts
+  1. Chance (sum of dice) = 17 pts
