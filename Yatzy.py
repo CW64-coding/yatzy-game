@@ -109,7 +109,7 @@ def score(dice, section, player):
         # regex pattern for '1 pair'
         rx_1p = re.compile(r"""
             ([1-6])         # a valid die roll
-            .*?             # any other value (non-greed)
+            .*?             # any other value (non-greedy)
             \1              # then that same original die
                     """, re.VERBOSE)
 
@@ -131,32 +131,33 @@ def score(dice, section, player):
             "Score": ([0] if two_pairs == []
                         else [2*(x[0]+x[1]) for x in two_pairs])}
            
+        three_pairs = list(combo(all_pairs, 3)) # empty if no '3 pair'
+
+        score_choice["3 pairs"] = {
+            "Dice": three_pairs, "Score": [2*sum(three_pairs)]}
+           
+                    
+        # regex pattern for triples/'3 of a kind'
+        rx_3k = re.compile(r"""
+            ([1-6])         # a valid die roll
+            .*?             # any other value (non-greedy)
+            \1              # then that same original die
+            .*?             # any other value (non-greedy)
+            \1              # original value a third time
+                    """, re.VERBOSE)
+
+        all_triples = [int(x) for x in re.findall(rx_3k, dice_str)]
+        
+        score_choice["3 of a kind"] = {
+            "Dice": all_triples,
+            "Score": ([0] if all_triples == []
+                else [3*x for x in all_triples])}
+   
             
             
             
             
-            
-            
-#        two_pairs = list(set([x for x in combo(all_pairs
-#                    + list(set([x for x in dice
-#                                if dice.count(x) >= 4])), 2)]))
-#
-#        score_choice["2 pairs"] = {
-#            "Dice": two_pairs,
-#            "Score": ([0] if len(two_pairs) == 0
-#                else [2*(x[0]+x[1]) for x in two_pairs])}
-#        
-#
-#        three_pairs = ([x for x in combo(all_pairs, 3)]
-#                        if len(set(dice)) > 1
-#                        else [(x, x, x) for x in set(dice)])
-#        
-#        score_choice["3 pairs"] = {
-#            "Dice": three_pairs,
-#            "Score": ([0] if three_pairs == []
-#                else [2*(x[0]+x[1]+x[2]) for x in three_pairs])}
-#        
-#
+
 #        all_triples = sorted(list(set(x for x in dice
 #                        if dice.count(x) >= 3)), reverse=True)
 #        
