@@ -100,8 +100,11 @@ def score(dice, section, player):
                 continue
     elif section == lower_rows:
         score_choice = {}
-        
-        all_pairs = list(set(x for x in dice if dice.count(x) >= 2))
+
+         # TODO: consider new approach - creating a count dictionary
+         # 
+       
+        all_pairs = [x for x in dice if dice.count(x) >= 2)]
 
         score_choice["1 pair"] = {
             "Dice": all_pairs,
