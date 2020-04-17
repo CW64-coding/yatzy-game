@@ -118,15 +118,13 @@ def score(dice, section, player):
 
 
         score_choice["1 pair"] = {
-            "Dice": [x for x in dice if dice.count(x) > 1],
-            "Score": [2*x for x in dice if dice.count(x) > 1]
-        
+            "Dice": sorted(all_pairs),  # sort for easier readability
+            "Score": [2*x for x in sorted(all_pairs)]}
+                                 
         score_choice["2 pairs"] = {
-            "Dice": [(x,y) for x in dice if dice.count(x) > 1
-                            for y in dice if x != y and dice.count(y) > 1]
-                    + [(,
-            "Score": ([0] if len(two_pairs) == 0
-                else [2*(x[0]+x[1]) for x in two_pairs])}
+            "Dice": sorted(list(set(combo(all_pairs, 2)))),
+            "Score": [2*(x[0]+x[1])
+                    for x in sorted(list(set(combo(all_pairs, 2))))}
         
         # TODO: I think case of [1,1,1,1,4,4] wouldn't offer [(1,1,4)]... FIX BELOW
 
