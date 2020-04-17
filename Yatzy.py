@@ -107,14 +107,14 @@ def score(dice, section, player):
         # a list of dice appearing frequency MOD 2 times
         # using tuples in order to do the calc, so must convert to str
         # will convert back afterwards
-        all_pairs = [tuple(x)*(dice.count(x) // 2) for str(x) in dice]
+        all_pairs = [tuple(str(x))*(dice.count(x) // 2) for x in dice]
         
         # eg. [1,1,1,1,2,3] -> [('1','1'), ('1','1'), ('1','1')]
-        # so we use list(set()) for a unique list of lists
+        # so we use list(set()) for a unique list of tuples
         all_pairs = list(set(all_pairs))
 
-        # then loop through the lists and concatenate the values as int
-        all_pairs = [int(x) for lst in all_pairs for x in lst]
+        # then loop through the tuples and concatenate the values as int
+        all_pairs = [int(x) for tup in all_pairs for x in tup]
 
 
         score_choice["1 pair"] = {
@@ -127,18 +127,17 @@ def score(dice, section, player):
                     for x in sorted(list(set(combo(all_pairs, 2))))}
         
         score_choice["3 pairs"] = {
-            "Dice": sorted(list(set(combo(all_pairs, 3)))),
-            "Score": ([0] if three_pairs == []
-                else [2*(x[0]+x[1]+x[2]) for x in three_pairs])}
+            "Dice": list(combo(all_pairs, 3)), # 0/1 item so no sort/set
+            "Score": [2*sum(x) for x in combo(all_pairs, 3)]}
         
+        # same process as above for 'all_pairs'
+        all_triples = [tuple(str(x))*(dice.count(x) // 3) for x in dice]
+        all_triples = list(set(all_triples))
+        all_triples = [int(x) for tup in all_triples for x in tup]
 
-        all_triples = sorted(list(set(x for x in dice
-                        if dice.count(x) >= 3)), reverse=True)
-        
         score_choice["3 of a kind"] = {
-            "Dice": all_triples,
-            "Score": ([0] if all_triples == []
-                else [3*x for x in all_triples])}
+            "Dice": sorted(all_triples),
+            "Score": [3*x for x in sorted(all_triples)]}
         
 
         all_quads = list(set([x for x in dice if dice.count(x) >= 4]))
