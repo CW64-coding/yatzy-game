@@ -109,7 +109,7 @@ def score(dice, section, player):
         # will convert back afterwards
         all_pairs = [tuple(x)*(dice.count(x) // 2) for str(x) in dice]
         
-        # eg. [1,1,1,2,3] -> [('1','1','1'),('1','1','1'),('1','1','1')]
+        # eg. [1,1,1,1,2,3] -> [('1','1'), ('1','1'), ('1','1')]
         # so we use list(set()) for a unique list of lists
         all_pairs = list(set(all_pairs))
 
@@ -126,14 +126,8 @@ def score(dice, section, player):
             "Score": [2*(x[0]+x[1])
                     for x in sorted(list(set(combo(all_pairs, 2))))}
         
-        # TODO: I think case of [1,1,1,1,4,4] wouldn't offer [(1,1,4)]... FIX BELOW
-
-        three_pairs = ([x for x in combo(all_pairs, 3)]
-                        if len(set(dice)) > 1
-                        else [(x, x, x) for x in set(dice)])
-              
         score_choice["3 pairs"] = {
-            "Dice": three_pairs,
+            "Dice": sorted(list(set(combo(all_pairs, 3)))),
             "Score": ([0] if three_pairs == []
                 else [2*(x[0]+x[1]+x[2]) for x in three_pairs])}
         
