@@ -107,7 +107,8 @@ def score(dice, section, player):
         # a list of dice appearing frequency MOD 2 times
         # using tuples in order to do the calc, so must convert to str
         # will convert back afterwards
-        all_pairs = [tuple(str(x))*(dice.count(x) // 2) for x in dice]
+        all_pairs = [tuple(str(x))*(dice_count[x] // 2)
+                        for x in dice_count]
         
         # eg. [1,1,1,1,2,3] -> [('1','1'), ('1','1'), ('1','1')]
         # so we use list(set()) for a unique list of tuples
@@ -118,8 +119,9 @@ def score(dice, section, player):
 
 
         score_choice["1 pair"] = {
-            "Dice": sorted(all_pairs),  # sort for easier readability
-            "Score": [2*x for x in sorted(all_pairs)]}
+            # sorted added for easier user readability
+            "Dice": sorted([x for x in dice_count if dice_count[x] > 1]),
+            "Score": sorted([2*x for x in dice_count[x] > 1)])}
                                  
         score_choice["2 pairs"] = {
             "Dice": sorted(list(set(combo(all_pairs, 2)))),
@@ -131,7 +133,7 @@ def score(dice, section, player):
             "Score": [2*sum(x) for x in combo(all_pairs, 3)]}
         
         # same process as above for 'all_pairs'
-        all_triples = [tuple(str(x))*(dice.count(x) // 3) for x in dice]
+        all_triples = [tuple(str(x))*(dice_count[x] // 3) for x in dice]
         all_triples = list(set(all_triples))
         all_triples = [int(x) for tup in all_triples for x in tup]
 
@@ -140,7 +142,7 @@ def score(dice, section, player):
             "Score": [3*x for x in sorted(all_triples)]}
         
 
-        all_quads = list(set([x for x in dice if dice.count(x) >= 4]))
+        all_quads = [x for x in 
 
         score_choice["4 of a kind"] = {
             "Dice": all_quads,
