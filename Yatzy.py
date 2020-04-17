@@ -84,7 +84,6 @@ def score(dice, section, player):
         time.sleep(t)
         print("Make a selection, type 1-6. E.g. for 'Four's', enter: 4")
         print("(Note you can only choose a free option)")
-        print("(...and only the maximum score will be taken, of course!)")
         print()
         while True:
             try:
@@ -121,9 +120,9 @@ def score(dice, section, player):
 
         score_choice["1 pair"] = {
             # sorted added for easier user readability
-            "Dice": sorted([x for x in dice_count if dice_count[x] > 1]),
-            "Score": [0] if all_pairs == []
-                        else sorted([2*x for x in dice_count[x] > 1])}
+            "Dice": [x for x in set(all_pairs)],
+            "Score": [0] if all_pairs == [] else 
+                    [2*x for x in set(all_pairs)]}
                                  
         score_choice["2 pairs"] = {
             "Dice": list(set(combo(all_pairs, 2))),
@@ -132,8 +131,10 @@ def score(dice, section, player):
         
 
         score_choice["3 pairs"] = {
-            "Dice": list(combo(all_pairs, 3)), # 0/1 item so no set
-            "Score": [2*sum(x) for x in combo(all_pairs, 3)]}
+            "Dice": list(combo(all_pairs, 3)),
+        # 0/1 item so no set required, output is either [] or [x]
+        # therefore below we can use double sum to give [0] or [sum()] 
+            "Score": [2*sum([sum(x) for x in combo(all_pairs, 3)])]}
         
         # same process as above for 'all_pairs'
         all_triples = [tuple(str(x))*(dice_count[x] // 3) for x in dice]
@@ -141,21 +142,21 @@ def score(dice, section, player):
         all_triples = [int(x) for tup in all_triples for x in tup]
 
         score_choice["3 of a kind"] = {
-            "Dice": all_triples,
+            "Dice": list(set(all_triples)),
             "Score": [0] if all_triples == [] 
-                        else [3*x for x in all_triples]}
+                        else [3*x for x in set(all_triples)]}
         
 
         all_quads = [x for x in dice_count if dice_count[x] > 3]
 
         score_choice["4 of a kind"] = {
-            "Dice": all_quads, "Score": 4*sum(all_quads)}
+            "Dice": all_quads, "Score": [4*sum(all_quads)]}
 
 
         five_kind = [x for x in dice_count if dice_count[x] >= 5]
 
         score_choice["5 of a kind"] = {
-            "Dice": five_kind, "Score": 5*sum(five_kind)}
+            "Dice": five_kind, "Score": [5*sum(five_kind)]}
 
 
         score_choice["Small straight"] = {
@@ -183,20 +184,24 @@ def score(dice, section, player):
 
         score_choice["Full House (3+2)"] = {
             "Dice": full_house,
-            "Score": sum([3*x[0]+2*x[1] for x in full_house])}
+            "Score": [sum([3*x[0]+2*x[1] for x in full_house])]}
                         
         
         score_choice["Villa (3+3)"] = {
             "Dice": list(combo(all_triples, 2)),
-            "Score": 3*sum(combo(all_triples, 2))}
+            # list is [] or 1 item only
+            # so below we can use double sum to give [0] or [sum()] 
+            "Score": [3*sum([sum(x) for x in combo(all_triples, 2)])]}
 
 
-        tower = list(combo(all_quads + [x for x in all_pairs
+        tower = list(combo(all_quads 
+                + len(all_quads)*[x for x in set(all_pairs)
                 if (x not in all_quads) or (dice_count[x] == 6)], 2))
                 # latter case in 'or' allows case of Yatzy
+                # len(all_quads) = 0 if no quads so ensure tower = []
 
         score_choice["Tower (4+2)"] = {
-            "Dice": tower, "Score": sum([4*x[0]+2*x[1] for x in tower])}
+            "Dice": tower, "Score": [sum([4*x[0]+2*x[1] for x in tower])]}
 
 
         score_choice["Chance"] = {
@@ -219,13 +224,13 @@ def score(dice, section, player):
         time.sleep(t)
 
         print()
+        print("(...only the highest possible score will be taken, of course!)")
         print()
         print("Make a selection, use this code:")
         print()
-        code_choices = list(zip(lower_codes, lower_rows))
-        for i in range(1, len(code_choices)+1):
-            print(code_choices[i-1].ljust(20), end="\t")
-            if (i % 3 == 0) and not (i == 1):
+        for i in range(len(lower_codes)):
+            print((lower_codes[i] + ": " + lower_rows[i]).ljust(20), end="\t")
+            if ((i+1) % 3 == 0) and (i != 0):
                 print()
         print()            
         print()
