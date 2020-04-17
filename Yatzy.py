@@ -101,23 +101,30 @@ def score(dice, section, player):
     elif section == lower_rows:
         score_choice = {}
 
-         # TODO: consider new approach - creating a count dictionary
-         # 
-       
-        all_pairs = [x for x in dice if dice.count(x) >= 2)]
+        # we create a dictionary with the dice and their roll counts
+        dice_count = {x: dice.count(x) for x in dice}
+        
+        # a list of dice appearing frequency MOD 2 times
+        # using tuples in order to do the calc, so must convert to str
+        # will convert back afterwards
+        all_pairs = [tuple(x)*(dice.count(x) // 2) for str(x) in dice]
+        
+        # eg. [1,1,1,2,3] -> [('1','1','1'),('1','1','1'),('1','1','1')]
+        # so we use list(set()) for a unique list of lists
+        all_pairs = list(set(all_pairs))
+
+        # then loop through the lists and concatenate the values as int
+        all_pairs = [int(x) for lst in all_pairs for x in lst]
+
 
         score_choice["1 pair"] = {
-            "Dice": all_pairs,
-            "Score": ([0] if all_pairs == []
-                else [2*x for x in all_pairs])}
+            "Dice": [x for x in dice if dice.count(x) > 1],
+            "Score": [2*x for x in dice if dice.count(x) > 1]
         
-        
-        two_pairs = list(set([x for x in combo(all_pairs
-                    + list(set([x for x in dice
-                                if dice.count(x) >= 4])), 2)]))
-
         score_choice["2 pairs"] = {
-            "Dice": two_pairs,
+            "Dice": [(x,y) for x in dice if dice.count(x) > 1
+                            for y in dice if x != y and dice.count(y) > 1]
+                    + [(,
             "Score": ([0] if len(two_pairs) == 0
                 else [2*(x[0]+x[1]) for x in two_pairs])}
         
