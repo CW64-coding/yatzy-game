@@ -112,7 +112,8 @@ def score(dice, section, player):
         
         # eg. [1,1,1,1,2,3] -> [('1','1'), ('1','1'), ('1','1')]
         # so we use list(set()) for a unique list of tuples
-        all_pairs = list(set(all_pairs))
+        # sorting hear saves codes in the later cases
+        all_pairs = sorted(list(set(all_pairs)))
 
         # then loop through the tuples and concatenate the values as int
         all_pairs = [int(x) for tup in all_pairs for x in tup]
@@ -121,66 +122,57 @@ def score(dice, section, player):
         score_choice["1 pair"] = {
             # sorted added for easier user readability
             "Dice": sorted([x for x in dice_count if dice_count[x] > 1]),
-            "Score": sorted([2*x for x in dice_count[x] > 1)])}
+            "Score": [0] if all_pairs == []
+                        else sorted([2*x for x in dice_count[x] > 1)])}
                                  
         score_choice["2 pairs"] = {
-            "Dice": sorted(list(set(combo(all_pairs, 2)))),
-            "Score": [2*(x[0]+x[1])
-                    for x in sorted(list(set(combo(all_pairs, 2))))}
+            "Dice": list(set(combo(all_pairs, 2))),
+            "Score": [0] if len(all_pairs) < 2
+                else [2*sum(x) for x in set(combo(all_pairs, 2))}
         
+
         score_choice["3 pairs"] = {
-            "Dice": list(combo(all_pairs, 3)), # 0/1 item so no sort/set
+            "Dice": list(combo(all_pairs, 3)), # 0/1 item so no set
             "Score": [2*sum(x) for x in combo(all_pairs, 3)]}
         
         # same process as above for 'all_pairs'
         all_triples = [tuple(str(x))*(dice_count[x] // 3) for x in dice]
-        all_triples = list(set(all_triples))
+        all_triples = sorted(list(set(all_triples)))
         all_triples = [int(x) for tup in all_triples for x in tup]
 
         score_choice["3 of a kind"] = {
-            "Dice": sorted(all_triples),
-            "Score": [3*x for x in sorted(all_triples)]}
+            "Dice": all_triples,
+            "Score": [0] if all_triples = [] 
+                        else [3*x for x in all_triples]}
         
 
-        all_quads = [x for x in 
+        all_quads = [x for x in dice_count if dice_count[x] > 3]
 
         score_choice["4 of a kind"] = {
-            "Dice": all_quads,
-            "Score": ([0] if all_quads == []
-                else [4*x for x in all_quads])}
+            "Dice": all_quads, "Score": sum(all_quads)}
 
 
-        five_kind = list(set([x for x in dice if dice.count(x) >= 5]))
+        five_kind = [x for x in dice_count if dice_count[x] >= 5]
 
         score_choice["5 of a kind"] = {
-            "Dice": five_kind,
-            "Score": ([0] if five_kind == []
-                else [5*x for x in five_kind])}
+            "Dice": five_kind, "Score": sum(five_kind)}
 
 
         score_choice["Small straight"] = {
             "Dice": ([1,2,3,4,5]
-                if all(x in dice for x in [1,2,3,4,5])
-                else []),
+                if all(x in dice for x in [1,2,3,4,5]) else []),
             "Score": ([15] 
-                if all(x in dice for x in [1,2,3,4,5])
-                else [0])}
+                if all(x in dice for x in [1,2,3,4,5]) else [0])}
 
         score_choice["Big straight"] = {
             "Dice": ([2,3,4,5,6]
-                if all(x in dice for x in [2,3,4,5,6])
-                else []),
+                if all(x in dice for x in [2,3,4,5,6]) else []),
             "Score": ([20] 
-                if all(x in dice for x in [2,3,4,5,6])
-                else [0])}
+                if all(x in dice for x in [2,3,4,5,6]) else [0])}
 
         score_choice["Full straight"] = {
-            "Dice": ([1,2,3,4,5,6]
-                if len(set(dice)) == 6
-                else []),
-            "Score": ([25]
-                if len(set(dice)) == 6
-                else [0])}
+            "Dice": ([1,2,3,4,5,6] if len(dice_count) == 6 else []),
+            "Score": ([25] if len(dice_count) == 6 else [0])}
 
 
         if (len(set(dice)) == 1):
