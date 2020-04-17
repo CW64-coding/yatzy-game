@@ -123,12 +123,12 @@ def score(dice, section, player):
             # sorted added for easier user readability
             "Dice": sorted([x for x in dice_count if dice_count[x] > 1]),
             "Score": [0] if all_pairs == []
-                        else sorted([2*x for x in dice_count[x] > 1)])}
+                        else sorted([2*x for x in dice_count[x] > 1])}
                                  
         score_choice["2 pairs"] = {
             "Dice": list(set(combo(all_pairs, 2))),
             "Score": [0] if len(all_pairs) < 2
-                else [2*sum(x) for x in set(combo(all_pairs, 2))}
+                else [2*sum(x) for x in set(combo(all_pairs, 2))]}
         
 
         score_choice["3 pairs"] = {
@@ -142,7 +142,7 @@ def score(dice, section, player):
 
         score_choice["3 of a kind"] = {
             "Dice": all_triples,
-            "Score": [0] if all_triples = [] 
+            "Score": [0] if all_triples == [] 
                         else [3*x for x in all_triples]}
         
 
@@ -175,7 +175,7 @@ def score(dice, section, player):
             "Score": ([25] if len(dice_count) == 6 else [0])}
 
 
-        if all_triples = [] or len(all_pairs) < 2:
+        if all_triples == [] or len(all_pairs) < 2:
             full_house = []
         else:
             full_house = list(combo(([x for x in all_triples]
@@ -192,12 +192,11 @@ def score(dice, section, player):
 
 
         tower = list(combo(all_quads + [x for x in all_pairs
-                    if (x not in all_quads) or (dice_count[x] == 6)], 2)
-                    # latter case in 'or' allows case of Yatzy
+                if (x not in all_quads) or (dice_count[x] == 6)], 2))
+                # latter case in 'or' allows case of Yatzy
 
         score_choice["Tower (4+2)"] = {
-            "Dice": tower,
-            "Score": sum([4*x[0]+2*x[1] for x in tower])}
+            "Dice": tower, "Score": sum([4*x[0]+2*x[1] for x in tower])}
 
 
         score_choice["Chance"] = {
