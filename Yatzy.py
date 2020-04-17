@@ -84,7 +84,6 @@ def score(dice, section, player):
         time.sleep(t)
         print("Make a selection, type 1-6. E.g. for 'Four's', enter: 4")
         print("(Note you can only choose a free option)")
-        print("(...and only the maximum score will be taken, of course!)")
         print()
         while True:
             try:
@@ -100,154 +99,138 @@ def score(dice, section, player):
                 continue
     elif section == lower_rows:
         score_choice = {}
+
+        # we create a dictionary with the dice and their roll counts
+        dice_count = {x: dice.count(x) for x in set(dice)}
         
-        all_pairs = list(set(x for x in dice if dice.count(x) >= 2))
+        # a list of dice appearing frequency MOD 2 times
+        # using tuples in order to do the calc, so must convert to str
+        # will convert back afterwards
+        all_pairs = [tuple(str(x))*(dice_count[x] // 2)
+                        for x in dice_count]
+        
+        # eg. [1,1,1,1,2,3] -> [('1','1'), ('1','1'), ('1','1')]
+        # so we use list(set()) for a unique list of tuples
+        # sorting hear saves codes in the later cases
+        all_pairs = sorted(list(set(all_pairs)))
+
+        # then loop through the tuples and concatenate the values as int
+        all_pairs = [int(x) for tup in all_pairs for x in tup]
+
 
         score_choice["1 pair"] = {
-            "Dice": all_pairs,
-            "Score": ([0] if all_pairs == []
-                else [2*x for x in all_pairs])}
-        
-        
-        two_pairs = list(set([x for x in combo(all_pairs
-                    + list(set([x for x in dice
-                                if dice.count(x) >= 4])), 2)]))
-
+            # sorted added for easier user readability
+            "Dice": [x for x in set(all_pairs)],
+            "Score": [0] if all_pairs == [] else 
+                    [2*x for x in set(all_pairs)]}
+                                 
         score_choice["2 pairs"] = {
-            "Dice": two_pairs,
-            "Score": ([0] if len(two_pairs) == 0
-                else [2*(x[0]+x[1]) for x in two_pairs])}
+            "Dice": list(set(combo(all_pairs, 2))),
+            "Score": [0] if len(all_pairs) < 2
+                else [2*sum(x) for x in set(combo(all_pairs, 2))]}
         
-        # TODO: I think case of [1,1,1,1,4,4] wouldn't offer [(1,1,4)]... FIX BELOW
 
-        three_pairs = ([x for x in combo(all_pairs, 3)]
-                        if len(set(dice)) > 1
-                        else [(x, x, x) for x in set(dice)])
-              
         score_choice["3 pairs"] = {
-            "Dice": three_pairs,
-            "Score": ([0] if three_pairs == []
-                else [2*(x[0]+x[1]+x[2]) for x in three_pairs])}
+            "Dice": list(combo(all_pairs, 3)),
+        # 0/1 item so no set required, output is either [] or [x]
+        # therefore below we can use double sum to give [0] or [sum()] 
+            "Score": [2*sum([sum(x) for x in combo(all_pairs, 3)])]}
         
+        # same process as above for 'all_pairs'
+        all_triples = [tuple(str(x))*(dice_count[x] // 3) for x in dice]
+        all_triples = sorted(list(set(all_triples)))
+        all_triples = [int(x) for tup in all_triples for x in tup]
 
-        all_triples = sorted(list(set(x for x in dice
-                        if dice.count(x) >= 3)), reverse=True)
-        
         score_choice["3 of a kind"] = {
-            "Dice": all_triples,
-            "Score": ([0] if all_triples == []
-                else [3*x for x in all_triples])}
+            "Dice": list(set(all_triples)),
+            "Score": [0] if all_triples == [] 
+                        else [3*x for x in set(all_triples)]}
         
 
-        all_quads = list(set([x for x in dice if dice.count(x) >= 4]))
+        all_quads = [x for x in dice_count if dice_count[x] > 3]
 
         score_choice["4 of a kind"] = {
-            "Dice": all_quads,
-            "Score": ([0] if all_quads == []
-                else [4*x for x in all_quads])}
+            "Dice": all_quads, "Score": [4*sum(all_quads)]}
 
 
-        five_kind = list(set([x for x in dice if dice.count(x) >= 5]))
+        five_kind = [x for x in dice_count if dice_count[x] >= 5]
 
         score_choice["5 of a kind"] = {
-            "Dice": five_kind,
-            "Score": ([0] if five_kind == []
-                else [5*x for x in five_kind])}
+            "Dice": five_kind, "Score": [5*sum(five_kind)]}
 
 
         score_choice["Small straight"] = {
             "Dice": ([1,2,3,4,5]
-                if all(x in dice for x in [1,2,3,4,5])
-                else []),
+                if all(x in dice for x in [1,2,3,4,5]) else []),
             "Score": ([15] 
-                if all(x in dice for x in [1,2,3,4,5])
-                else [0])}
+                if all(x in dice for x in [1,2,3,4,5]) else [0])}
 
         score_choice["Big straight"] = {
             "Dice": ([2,3,4,5,6]
-                if all(x in dice for x in [2,3,4,5,6])
-                else []),
+                if all(x in dice for x in [2,3,4,5,6]) else []),
             "Score": ([20] 
-                if all(x in dice for x in [2,3,4,5,6])
-                else [0])}
+                if all(x in dice for x in [2,3,4,5,6]) else [0])}
 
         score_choice["Full straight"] = {
-            "Dice": ([1,2,3,4,5,6]
-                if len(set(dice)) == 6
-                else []),
-            "Score": ([25]
-                if len(set(dice)) == 6
-                else [0])}
+            "Dice": ([1,2,3,4,5,6] if len(dice_count) == 6 else []),
+            "Score": ([25] if len(dice_count) == 6 else [0])}
 
 
-        if (len(set(dice)) == 1):
-            full_house = [2*[x for x in all_triples]]
-        elif (all_triples == [] or len(all_pairs) < 2):
+        if all_triples == [] or len(all_pairs) < 2:
             full_house = []
         else:
             full_house = list(combo(([x for x in all_triples]
                 + [y for y in all_pairs if y not in all_triples]), 2))
 
-
         score_choice["Full House (3+2)"] = {
             "Dice": full_house,
-            "Score": ([0] if full_house == []
-                            else [3*x[0]+2*x[1] for x in full_house])}
+            "Score": [sum([3*x[0]+2*x[1] for x in full_house])]}
                         
         
-        if (len(set(dice)) == 1):
-            villa = [2*[x for x in all_triples]]
-        else:
-            villa = list(combo(all_triples, 2))
-
         score_choice["Villa (3+3)"] = {
-            "Dice": villa,
-            "Score": ([0] if villa == []
-                            else [3*x[0] + 3*x[1] for x in villa])}
+            "Dice": list(combo(all_triples, 2)),
+            # list is [] or 1 item only
+            # so below we can use double sum to give [0] or [sum()] 
+            "Score": [3*sum([sum(x) for x in combo(all_triples, 2)])]}
 
 
-        if (all_quads == []):
-           tower = []
-        elif (len(set(dice)) == 1):
-            tower = [2*[x for x in all_quads]]
-        else:
-            tower = list(combo(all_quads + 
-                    [x for x in all_pairs if x not in all_quads], 2))
-                
+        tower = list(combo(all_quads 
+                + len(all_quads)*[x for x in set(all_pairs)
+                if (x not in all_quads) or (dice_count[x] == 6)], 2))
+                # latter case in 'or' allows case of Yatzy
+                # len(all_quads) = 0 if no quads so ensure tower = []
 
         score_choice["Tower (4+2)"] = {
-            "Dice": tower,
-            "Score": ([0] if tower == []
-                            else [4*x[0] + 2*x[1] for x in tower])}
+            "Dice": tower, "Score": [sum([4*x[0]+2*x[1] for x in tower])]}
 
 
-        score_choice["Chance"] = {"Dice": dice, "Score": [sum(dice)]}
+        score_choice["Chance"] = {
+            "Dice": sorted(dice), "Score": [sum(dice)]}
 
-
-        yatzy = [] if len(set(dice)) > 1 else dice
 
         score_choice["MAXI YATZY"] = {
-            "Dice": yatzy,
-            "Score": ([0] if yatzy == [] else [100])}
+            "Dice": dice if len(dice_count) == 1 else [],
+            "Score": [100] if len(dice_count) == 1 else [0]}
 
         print()
         print()
         print("Possible scores   = [Dice used]                    [Score]:-","\n")
         
         for key in score_choice.keys():
+            # adjustments ensure table is aligned visually for the user
             print(key.ljust(18), end = "= ")
             print(str(score_choice[key]["Dice"]).ljust(30), end=" ")
             print(score_choice[key]["Score"]) 
         time.sleep(t)
 
         print()
+        print("(...only the highest possible score will be taken, of course!)")
         print()
         print("Make a selection, use this code:")
         print()
-        code_choices = list(zip(lower_codes, lower_rows))
-        for i in range(1, len(code_choices)+1):
-            print(code_choices[i-1], end="\t")
-            if (i % 3 == 0) and not (i == 1):
+        for i in range(len(lower_codes)):
+            print((lower_codes[i] + ": " + lower_rows[i]).ljust(20), end="\t")
+            if ((i+1) % 3 == 0) and (i != 0):
                 print()
         print()            
         print()
@@ -290,13 +273,12 @@ def re_roll():
             , re.VERBOSE):          # re.VERBOSE allows above indenting/comments
 
         dice_to_reroll = input("""
-        Enter a string of dice to RE-ROLL.
-        (For example, to re-roll all except dice B & C enter: ADEF)
-        Enter now: """).upper()
+            Enter a string of dice to RE-ROLL.
+            (For example, to re-roll all except dice B & C enter: ADEF)
+            Enter now: """).upper()
     
     for letter in dice_to_reroll:
        current_roll[letter] = randint(1,6)
-
 
 def roll(player):
     global current_roll
