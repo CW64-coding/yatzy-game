@@ -102,7 +102,7 @@ def score(dice, section, player):
         score_choice = {}
 
         # we create a dictionary with the dice and their roll counts
-        dice_count = {x: dice.count(x) for x in dice}
+        dice_count = {x: dice.count(x) for x in set(dice)}
         
         # a list of dice appearing frequency MOD 2 times
         # using tuples in order to do the calc, so must convert to str
@@ -149,13 +149,13 @@ def score(dice, section, player):
         all_quads = [x for x in dice_count if dice_count[x] > 3]
 
         score_choice["4 of a kind"] = {
-            "Dice": all_quads, "Score": sum(all_quads)}
+            "Dice": all_quads, "Score": 4*sum(all_quads)}
 
 
         five_kind = [x for x in dice_count if dice_count[x] >= 5]
 
         score_choice["5 of a kind"] = {
-            "Dice": five_kind, "Score": sum(five_kind)}
+            "Dice": five_kind, "Score": 5*sum(five_kind)}
 
 
         score_choice["Small straight"] = {
@@ -175,61 +175,45 @@ def score(dice, section, player):
             "Score": ([25] if len(dice_count) == 6 else [0])}
 
 
-        if (len(set(dice)) == 1):
-            full_house = [2*[x for x in all_triples]]
-        elif (all_triples == [] or len(all_pairs) < 2):
+        if all_triples = [] or len(all_pairs) < 2:
             full_house = []
         else:
             full_house = list(combo(([x for x in all_triples]
                 + [y for y in all_pairs if y not in all_triples]), 2))
 
-
         score_choice["Full House (3+2)"] = {
             "Dice": full_house,
-            "Score": ([0] if full_house == []
-                            else [3*x[0]+2*x[1] for x in full_house])}
+            "Score": sum([3*x[0]+2*x[1] for x in full_house])}
                         
         
-        if (len(set(dice)) == 1):
-            villa = [2*[x for x in all_triples]]
-        else:
-            villa = list(combo(all_triples, 2))
-
         score_choice["Villa (3+3)"] = {
-            "Dice": villa,
-            "Score": ([0] if villa == []
-                            else [3*x[0] + 3*x[1] for x in villa])}
+            "Dice": list(combo(all_triples, 2)),
+            "Score": 3*sum(combo(all_triples, 2))}
 
 
-        if (all_quads == []):
-           tower = []
-        elif (len(set(dice)) == 1):
-            tower = [2*[x for x in all_quads]]
-        else:
-            tower = list(combo(all_quads + 
-                    [x for x in all_pairs if x not in all_quads], 2))
-                
+        tower = list(combo(all_quads + [x for x in all_pairs
+                    if (x not in all_quads) or (dice_count[x] == 6)], 2)
+                    # latter case in 'or' allows case of Yatzy
 
         score_choice["Tower (4+2)"] = {
             "Dice": tower,
-            "Score": ([0] if tower == []
-                            else [4*x[0] + 2*x[1] for x in tower])}
+            "Score": sum([4*x[0]+2*x[1] for x in tower])}
 
 
-        score_choice["Chance"] = {"Dice": dice, "Score": [sum(dice)]}
+        score_choice["Chance"] = {
+            "Dice": sorted(dice), "Score": [sum(dice)]}
 
-
-        yatzy = [] if len(set(dice)) > 1 else dice
 
         score_choice["MAXI YATZY"] = {
-            "Dice": yatzy,
-            "Score": ([0] if yatzy == [] else [100])}
+            "Dice": dice if len(dice_count) == 1 else [],
+            "Score": [100] if len(dice_count) == 1 else [0]}
 
         print()
         print()
         print("Possible scores   = [Dice used]                    [Score]:-","\n")
         
         for key in score_choice.keys():
+            # adjustments ensure table is aligned visually for the user
             print(key.ljust(18), end = "= ")
             print(str(score_choice[key]["Dice"]).ljust(30), end=" ")
             print(score_choice[key]["Score"]) 
@@ -241,7 +225,7 @@ def score(dice, section, player):
         print()
         code_choices = list(zip(lower_codes, lower_rows))
         for i in range(1, len(code_choices)+1):
-            print(code_choices[i-1], end="\t")
+            print(code_choices[i-1].ljust(20), end="\t")
             if (i % 3 == 0) and not (i == 1):
                 print()
         print()            
@@ -285,13 +269,12 @@ def re_roll():
             , re.VERBOSE):          # re.VERBOSE allows above indenting/comments
 
         dice_to_reroll = input("""
-        Enter a string of dice to RE-ROLL.
-        (For example, to re-roll all except dice B & C enter: ADEF)
-        Enter now: """).upper()
+            Enter a string of dice to RE-ROLL.
+            (For example, to re-roll all except dice B & C enter: ADEF)
+            Enter now: """).upper()
     
     for letter in dice_to_reroll:
        current_roll[letter] = randint(1,6)
-
 
 def roll(player):
     global current_roll
