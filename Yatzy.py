@@ -224,9 +224,9 @@ def score(dice, section, player):
         time.sleep(t)
 
         print()
-        print("(...only the highest possible score will be taken, of course!)")
         print()
         print("Make a selection, use this code:")
+        print("(...only the highest possible score per chosen row will be taken, of course!)")
         print()
         for i in range(len(lower_codes)):
             print((lower_codes[i] + ": " + lower_rows[i]).ljust(20), end="\t")
