@@ -17,7 +17,7 @@ from itertools import combinations as combo     # for finding sets
 
 t = 0           # variable for pauses, set to 0 while testing
 
-class Player():
+class Player():     # Player class holds name and counter of extra rolls
     def __init__(self, name, extra_rolls=0):
         self.n = name
         self.e = extra_rolls
@@ -49,31 +49,26 @@ def game_setup():       # function to set number of players & get names
         players.append(Player(name = name_input))
 
 game_setup()
-        
+       
+# names of the different potential scores and respective codes
 upper_rows = ["One's", "Two's", "Three's",
-                "Four's", "Five's", "Six's"]    # Add subtotal/bonus later
+                "Four's", "Five's", "Six's"]
 
 lower_rows = ["1 pair", "2 pairs", "3 pairs",
                 "3 of a kind", "4 of a kind", "5 of a kind",
                 "Small straight", "Big straight", "Full straight",
                 "Full House (3+2)", "Villa (3+3)", "Tower (4+2)",
-                "Chance", "MAXI YATZY"]         # Add grand total
+                "Chance", "MAXI YATZY"]
 
 lower_codes = ["1p", "2p", "3p", "3k", "4k", "5k", "ss", "bs", "fs",
                 "fh", "vi", "tw", "ch", "my"]
 
-
 scoresheet = pd.DataFrame(index = upper_rows, columns = [P.n for P in players])
 
 
-print()
-print("LET YATZY BEGIN!!!")
-print()
-print(scoresheet)
-print()
-print("(Note - 'NaN' is a blank placeholder)")
-
-def score(dice, section, player):
+# function calculates possible scores from the current roll
+# then returns the players choice and the respective score
+def score(dice, section, player): 
     if section == upper_rows:
         score_choice = {}
         for i in range(len(upper_rows)):
@@ -111,7 +106,7 @@ def score(dice, section, player):
         
         # eg. [1,1,1,1,2,3] -> [('1','1'), ('1','1'), ('1','1')]
         # so we use list(set()) for a unique list of tuples
-        # sorting hear saves codes in the later cases
+        # sorting  saves codes in the later cases
         all_pairs = sorted(list(set(all_pairs)))
 
         # then loop through the tuples and concatenate the values as int
@@ -253,7 +248,7 @@ def score(dice, section, player):
         print("Unexpected 'section' error...")
 
 
-def update_score(player):
+def update_score(player):       # function to update score after user has chosen
     dice = [*current_roll.values()]     # dictionary's values in a list 
     row, points = score(dice, section, player)
     if section == upper_rows:
@@ -261,8 +256,10 @@ def update_score(player):
     else:
         scoresheet.loc[row, player.n] = max(points, default = 0)
 
-def re_roll():
+
+def re_roll():          # function re-rolls the dice as per user choice
     dice_to_reroll = ""
+    # while loop ensures user input is combo of "A"-"F" (no repeats)
     while not re.search(r"""
             ^                      # fixed start position
               (?!                  # negative lookahead i.e. ensure no match for...
@@ -280,7 +277,9 @@ def re_roll():
     for letter in dice_to_reroll:
        current_roll[letter] = randint(1,6)
 
-def roll(player):
+# function that rolls 6 die, 3 times, calling re_roll() if user wants 
+# then the function allows user to use extra rolls (with re_roll())
+def roll(player):   
     global current_roll
     current_roll = dict(zip(["A","B","C","D","E","F"],
                             [randint(1,6) for _ in range(6)]))
@@ -310,7 +309,6 @@ def roll(player):
             player.e += (2-i)
             break
 
-
     print("-"*72)
     print(f"You have {player.e} extra rolls remaining.")
     if choice != "1" and player.e > 0:
@@ -320,25 +318,34 @@ def roll(player):
             if choice not in ["y", "yes", "n", "no"]:
                 print("Please enter a valid answer.")
                 continue
+            elif choice in ["y", "yes"]:
+                re_roll()
+                print()
+                print(f"Extra Roll =")
+                time.sleep(t)
+                print(current_roll,"\n")
+                time.sleep(t)
+                player.e -= 1
             else:
-                if choice in ["y", "yes"]:
-                    re_roll()
-                    print()
-                    print(f"Extra Roll =")
-                    time.sleep(t)
-                    print(current_roll,"\n")
-                    time.sleep(t)
-                    player.e -= 1
-                else:
-                    break
+                break
+
     update_score(player)
     print()
     print(scoresheet)
     print()
     time.sleep(t)
 
-
+# function plays the game, calling roll for each player each round
+# then printing the updated scoresheet as the game progresses 
 def play_Yatzy():
+    print()
+    print("LET YATZY BEGIN!!!")
+    print()
+    global scoresheet           # otherwise scoresheet is a new local variable
+    print(scoresheet)
+    print()
+    print("(Note - 'NaN' is a blank placeholder)")
+
     global section
     section = upper_rows      # for separating the game sections
     for i in range(6):
@@ -348,7 +355,6 @@ def play_Yatzy():
             print("="*72)
             roll(players[j])
             print("="*72)
-    global scoresheet           # otherwise scoresheet is a new local variable
     scoresheet.loc["Subtotal - Upper"] = 0
     scoresheet.loc["Bonus"] = 0
     for P in players:
@@ -376,11 +382,10 @@ def play_Yatzy():
     print(scoresheet)
     print("*"*72)
     print("="*72)
-   
-    section = lower_rows
     print()
     print()
     time.sleep(t)
+
     print("Final section...")
     print() 
     ss_lower = pd.DataFrame(index = lower_rows, columns = [p.n for p in players])
@@ -391,7 +396,8 @@ def play_Yatzy():
     print()
     print()
     print("-"*72)
-
+    
+    # for each round for each player, print out the round then call roll()
     for i in range(6, 6+len(section)):
         for j in range(n):
             print()
@@ -399,7 +405,6 @@ def play_Yatzy():
             print("="*72)
             roll(players[j])
             print("="*72)
-    
     time.sleep(t)
 
     scoresheet.loc["------"] = "---"
@@ -421,5 +426,6 @@ def play_Yatzy():
     print("*"*72)
     print("="*72)
     print()
+
 
 play_Yatzy()
